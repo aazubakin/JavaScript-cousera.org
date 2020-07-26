@@ -13,23 +13,27 @@
 
 module.exports = function (hashtags) {
    var newArr = [];
-   var tempArr = [];
-   var str;
+   var mySet = new Set();
    newArr = hashtags.map(function (x) {
       return x.toLowerCase();
    });
-   tempArr = newArr.map(function (x) { return x });
-   // сравниваем элементы массивов и удаляем повторы
-   for (var i = 0; i < newArr.length; i++) {
-      for (var j = i + 1; j < tempArr.length; j++) {
-         if (newArr[i] === tempArr[j + 1]) {
-            tempArr.splice(j + 1, 1);
-         }
+   mySet.add(newArr[0]);
+   // удаляем повторениe
+   for (var i = 1; i < newArr.length; i++) {
+      if (mySet.has(newArr[i])) {
+      } else {
+         mySet.add(newArr[i]);
       }
    }
+   /*for (var i = 0; i < newArr.length; i++) {
+      if (!str.indexOf(newArr[i])) {
+         result.push(newArr[i]);
+      }
+   }*/
+   newArr = [...mySet];
    // добавляем пробелы 
-   for (var i = 1; i < tempArr.length; i++) {
-      tempArr[i] = ' ' + tempArr[i];
+   for (var i = 1; i < newArr.length; i++) {
+      newArr[i] = ' ' + newArr[i];
    }
-   return tempArr.join();
+   return newArr.join();
 }
