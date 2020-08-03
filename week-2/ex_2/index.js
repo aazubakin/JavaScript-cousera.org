@@ -32,8 +32,8 @@ module.exports = function (hashtags) {
    }*/
    newArr = [...mySet];
    // добавляем пробелы 
-   for (var i = 1; i < newArr.length; i++) {
+   /*for (var i = 1; i < newArr.length; i++) {
       newArr[i] = ' ' + newArr[i];
-   }
-   return newArr.join();
+   }*/
+   return newArr.join(', ');
 }
