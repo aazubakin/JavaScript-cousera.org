@@ -36,4 +36,4 @@ module.exports = function (hashtags) {
       newArr[i] = ' ' + newArr[i];
    }*/
    return newArr.join(', ');
-}
+};
