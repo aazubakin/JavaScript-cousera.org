@@ -1,9 +1,5 @@
 // Телефонная книга
 var phoneBook = {};
-var mySet = new Set();
-phoneBook = mySet;
-//console.log(commandName);
-
 /**
  * @param {String} command
  * @returns {*} - результат зависит от команды
@@ -60,6 +56,7 @@ phoneBook('SHOW');
 
 // ["Ivan: 555-10-01, 555-10-02"]
  */
+num = new Set();
 module.exports = function (command) {
    // ...
    var comandArr = command.split(/ |,|, /);
@@ -68,15 +65,31 @@ module.exports = function (command) {
    var result = [];
    var removed = false;
    var res = [];
+   //---------------------------------
+   var name;
+   var numbers = new Set();
+   // стандартная функция объединения двух сетов
+   function union(setA, setB) {
+      var _union = new Set(setA);
+      for (var elem of setB) {
+         _union.add(elem);
+      }
+      return _union;
+   }
+
    // ...
    // Обработка команды ADD
    function addPhone() {
-      for (var i = 0; i < comandArr.length; i++) {
-         if (i === 0) {
-            phoneBook.add(comandArr[i] + ':');
-         } else phoneBook.add(comandArr[i]);
+      name = comandArr[0];
+      for (var i = 1; i < comandArr.length; i++) {
+         numbers.add(comandArr[i]);
       }
+      if (name in phoneBook) {
+         phoneBook[name] = union(phoneBook[name], numbers);
+      } else phoneBook[name] = numbers;
+      console.log(phoneBook);
    }
+
    //Обработка команды REMOVE 
    function removePhone() {
       for (var i = 0; i < comandArr.length; i++) { //возможность удаления нескольких телефонов за раз
@@ -88,17 +101,19 @@ module.exports = function (command) {
    }
    //Обработка команды SHOW
    function showItem() {
-      var resNames = [];
+      var resNamesIndex = [];
       var resNumbers = [];
+      var resNames = [];
       //получаем имена 
       for (var i = 0; i < result.length; i++) {
          if (result[i].search(/[a-z]/) !== -1) {
-            resNames.push(i);
+            resNamesIndex.push(i);
+            resNames.push(result[i]);
          }
       }
       //получаем номера телефонов
-      for (i = 0; i <= resNames.length - 1; i++) {
-         resNumbers.push(result.slice(resNames[i] + 1, resNames[i + 1]).join(', '));
+      for (i = 0; i <= resNamesIndex.length - 1; i++) {
+         resNumbers.push(result.slice(resNamesIndex[i] + 1, resNamesIndex[i + 1]).join(', '));
       }
       //соединяем имя с группой телефонов
       for (i = resNumbers.length - 1; i != -1; i--) {
@@ -106,9 +121,8 @@ module.exports = function (command) {
          if (resNumbers[i] == '') {
             continue;
          }
-         res.push(result[resNames[i]] + ' ' + resNumbers[i]);
+         res.push(result[resNamesIndex[i]] + ' ' + resNumbers[i]);
       }
-      //console.log(phoneBook);
    }
 
    if (commandName === 'ADD') {
@@ -123,11 +137,23 @@ module.exports = function (command) {
    if (commandName === 'SHOW') {
       result = [...phoneBook];
       showItem();
-      //console.log(res);
+      console.log(res);
       return res;
    }
 };
 
+/*Failed tests: 
+После команд "ADD Ivan 555,666; ADD Alex 777; ADD Alex 333; ADD Ivan 444; SHOW", ожидается результат: 
+["Alex: 777, 333","Ivan: 555, 666, 444"]
+После команд "ADD Ivan 555,666; ADD Alex 777; ADD Alex 333; REMOVE_PHONE 555; REMOVE_PHONE 666; ADD Ivan 888; SHOW", ожидается результат: 
+["Alex: 777, 333","Ivan: 888"]
+*/
+
+module.exports('ADD Ivan 555,666');
+module.exports('ADD Alex 777');
+module.exports('ADD Alex 333');
+module.exports('ADD Ivan 444');
+//module.exports('SHOW');
 
 /*
 module.exports('ADD Ivan 555-10-01,555-10-03');
