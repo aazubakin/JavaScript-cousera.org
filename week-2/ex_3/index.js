@@ -1,3 +1,5 @@
+const { connected } = require("process");
+
 // Телефонная книга
 var phoneBook = {};
 /**
@@ -56,7 +58,7 @@ phoneBook('SHOW');
 
 // ["Ivan: 555-10-01, 555-10-02"]
  */
-num = new Set();
+var name;
 module.exports = function (command) {
    // ...
    var comandArr = command.split(/ |,|, /);
@@ -64,9 +66,7 @@ module.exports = function (command) {
    comandArr.shift();
    var result = [];
    var removed = false;
-   var res = [];
    //---------------------------------
-   var name;
    var numbers = new Set();
    // стандартная функция объединения двух сетов
    function union(setA, setB) {
@@ -76,8 +76,6 @@ module.exports = function (command) {
       }
       return _union;
    }
-
-   // ...
    // Обработка команды ADD
    function addPhone() {
       name = comandArr[0];
@@ -87,41 +85,26 @@ module.exports = function (command) {
       if (name in phoneBook) {
          phoneBook[name] = union(phoneBook[name], numbers);
       } else phoneBook[name] = numbers;
-      console.log(phoneBook);
    }
 
    //Обработка команды REMOVE 
    function removePhone() {
       for (var i = 0; i < comandArr.length; i++) { //возможность удаления нескольких телефонов за раз
-         if (phoneBook.has(comandArr[i])) {
-            phoneBook.delete(comandArr[i]);
-            removed = true;
+         for (name in phoneBook) {
+            if (phoneBook[name].has(comandArr[i])) {
+               phoneBook[name].delete(comandArr[i]);
+               removed = true;
+            }
+            //если объект пустой то удалить имя
+            if ([...phoneBook[name]].length === 0) delete phoneBook[name];
+            //if ([...phoneBook[name]].join('') === '') delete phoneBook[name];
          }
       }
    }
    //Обработка команды SHOW
    function showItem() {
-      var resNamesIndex = [];
-      var resNumbers = [];
-      var resNames = [];
-      //получаем имена 
-      for (var i = 0; i < result.length; i++) {
-         if (result[i].search(/[a-z]/) !== -1) {
-            resNamesIndex.push(i);
-            resNames.push(result[i]);
-         }
-      }
-      //получаем номера телефонов
-      for (i = 0; i <= resNamesIndex.length - 1; i++) {
-         resNumbers.push(result.slice(resNamesIndex[i] + 1, resNamesIndex[i + 1]).join(', '));
-      }
-      //соединяем имя с группой телефонов
-      for (i = resNumbers.length - 1; i != -1; i--) {
-         //не выводить имени если номер удален
-         if (resNumbers[i] == '') {
-            continue;
-         }
-         res.push(result[resNamesIndex[i]] + ' ' + resNumbers[i]);
+      for (name in phoneBook) {
+         result.push(name + ': ' + [...phoneBook[name]].join(', '));
       }
    }
 
@@ -135,31 +118,32 @@ module.exports = function (command) {
       return removed;
    }
    if (commandName === 'SHOW') {
-      result = [...phoneBook];
       showItem();
-      console.log(res);
-      return res;
+      //console.log(result.sort());
+      return result.sort();
    }
 };
 
-/*Failed tests: 
-После команд "ADD Ivan 555,666; ADD Alex 777; ADD Alex 333; ADD Ivan 444; SHOW", ожидается результат: 
+/*Failed tests:
+После команд "ADD Ivan 555,666; ADD Alex 777; ADD Alex 333; ADD Ivan 444; SHOW", ожидается результат:
 ["Alex: 777, 333","Ivan: 555, 666, 444"]
-После команд "ADD Ivan 555,666; ADD Alex 777; ADD Alex 333; REMOVE_PHONE 555; REMOVE_PHONE 666; ADD Ivan 888; SHOW", ожидается результат: 
+После команд "ADD Ivan 555,666; ADD Alex 777; ADD Alex 333; REMOVE_PHONE 555; REMOVE_PHONE 666; ADD Ivan 888; SHOW", ожидается результат:
 ["Alex: 777, 333","Ivan: 888"]
-*/
+
 
 module.exports('ADD Ivan 555,666');
 module.exports('ADD Alex 777');
 module.exports('ADD Alex 333');
-module.exports('ADD Ivan 444');
-//module.exports('SHOW');
+module.exports('REMOVE_PHONE 555');
+module.exports('SHOW');
+*/
 
 /*
 module.exports('ADD Ivan 555-10-01,555-10-03');
 module.exports('ADD Ivan 555-10-02');
 module.exports('SHOW');
 module.exports('REMOVE_PHONE 555-10-03');
+module.exports('SHOW');
 module.exports('ADD Alex 555-20-01');
 module.exports('SHOW');
 module.exports('REMOVE_PHONE 555-20-01');
