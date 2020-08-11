@@ -26,17 +26,29 @@ module.exports = function (date) {
    var time = {
       value: date,
       add: function (count, val) {
-         this.value = new Date(date);
+         try {
+            var myList = new Set(['years', 'months', 'days', 'hours', 'minutes']);
+            if (count > 0 && myList.has(val)) {
+            } else throw new TypeError();
+         }
+         catch (e) {
+            return TypeError;
+         }
+
+         this.value = new Date(this.value);
          var year = this.value.getFullYear(),
             month = this.value.getMonth() + 1,
             day = this.value.getDate(),
             hour = this.value.getHours(),
             minutes = this.value.getMinutes();
+
          function calculateDate() {
             this.value = new Date(year, month, day, hour, minutes);
-            month = this.value.getMonth() + 1; //return date after count;
+            month = this.value.getMonth(); //return date after count;
             if (month < 10) month = '0' + month;
-            return this.value.getFullYear() + '-' + month + '-' + this.value.getDate() + ' ' + this.value.getHours() + ':' + this.value.getMinutes();
+            minutes = this.value.getMinutes();
+            if (minutes < 10) minutes = '0' + minutes;
+            return this.value.getFullYear() + '-' + month + '-' + this.value.getDate() + ' ' + this.value.getHours() + ':' + minutes;
          }
          if (val === 'years') {
             year += count;
@@ -63,19 +75,32 @@ module.exports = function (date) {
             this.value = calculateDate();
             return this;
          }
+
       },
       subtract: function (count, val) {
-         this.value = new Date(date);
+         try {
+            var myList = new Set(['years', 'months', 'days', 'hours', 'minutes']);
+            if (count > 0 && myList.has(val)) {
+            } else throw new TypeError();
+         }
+         catch (e) {
+            return TypeError;
+         }
+
+         this.value = new Date(this.value);
          var year = this.value.getFullYear(),
             month = this.value.getMonth() + 1,
             day = this.value.getDate(),
             hour = this.value.getHours(),
             minutes = this.value.getMinutes();
+
          function calculateDate() {
             this.value = new Date(year, month, day, hour, minutes);
-            month = this.value.getMonth() + 1; //return date after count;
+            month = this.value.getMonth(); //return date after count;
             if (month < 10) month = '0' + month;
-            return this.value.getFullYear() + '-' + month + '-' + this.value.getDate() + ' ' + this.value.getHours() + ':' + this.value.getMinutes();
+            minutes = this.value.getMinutes();
+            if (minutes < 10) minutes = '0' + minutes;
+            return this.value.getFullYear() + '-' + month + '-' + this.value.getDate() + ' ' + this.value.getHours() + ':' + minutes;
          }
          if (val === 'years') {
             year -= count;
@@ -104,11 +129,8 @@ module.exports = function (date) {
          }
       }
    };
-   // time.subtract(14, 'months');
-   //   console.log(time.value);
+   //console.log(time.add(2, 'light-years'));
    return time;
-
-
 };
 
-//module.exports('2020-08-8 10:40');
+//console.log(module.exports('2017-05-16 13:45').add(2, 'light-years'));
