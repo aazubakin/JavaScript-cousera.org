@@ -26,14 +26,9 @@ module.exports = function (date) {
    var time = {
       value: date,
       add: function (count, val) {
-         try {
-            var myList = new Set(['years', 'months', 'days', 'hours', 'minutes']);
-            if (count > 0 && myList.has(val)) {
-            } else throw new TypeError();
-         }
-         catch (e) {
-            return TypeError;
-         }
+         var myList = new Set(['years', 'months', 'days', 'hours', 'minutes']);
+         if (count > 0 && myList.has(val)) {
+         } else throw new TypeError();
 
          this.value = new Date(this.value);
          var year = this.value.getFullYear(),
@@ -43,12 +38,20 @@ module.exports = function (date) {
             minutes = this.value.getMinutes();
 
          function calculateDate() {
+            // обход 30 дней в месяце
+            if (!(month % 2) && day == 31 && month != 8) {
+               day++;
+            }
             this.value = new Date(year, month, day, hour, minutes);
+            day = this.value.getDate();
+            if (day < 10) day = '0' + day;
+            hour = this.value.getHours();
+            if (hour < 10) hour = '0' + hour;
             month = this.value.getMonth(); //return date after count;
             if (month < 10) month = '0' + month;
             minutes = this.value.getMinutes();
             if (minutes < 10) minutes = '0' + minutes;
-            return this.value.getFullYear() + '-' + month + '-' + this.value.getDate() + ' ' + this.value.getHours() + ':' + minutes;
+            return this.value.getFullYear() + '-' + month + '-' + day + ' ' + hour + ':' + minutes;
          }
          if (val === 'years') {
             year += count;
@@ -78,14 +81,9 @@ module.exports = function (date) {
 
       },
       subtract: function (count, val) {
-         try {
-            var myList = new Set(['years', 'months', 'days', 'hours', 'minutes']);
-            if (count > 0 && myList.has(val)) {
-            } else throw new TypeError();
-         }
-         catch (e) {
-            return TypeError;
-         }
+         var myList = new Set(['years', 'months', 'days', 'hours', 'minutes']);
+         if (count > 0 && myList.has(val)) {
+         } else throw new TypeError();
 
          this.value = new Date(this.value);
          var year = this.value.getFullYear(),
@@ -95,12 +93,19 @@ module.exports = function (date) {
             minutes = this.value.getMinutes();
 
          function calculateDate() {
+            if ((month % 2) && day < 0 || (month == 8 && day < 0)) {
+               day--;
+            }
             this.value = new Date(year, month, day, hour, minutes);
+            day = this.value.getDate();
+            if (day < 10) day = '0' + day;
+            hour = this.value.getHours();
+            if (hour < 10) hour = '0' + hour;
             month = this.value.getMonth(); //return date after count;
             if (month < 10) month = '0' + month;
             minutes = this.value.getMinutes();
             if (minutes < 10) minutes = '0' + minutes;
-            return this.value.getFullYear() + '-' + month + '-' + this.value.getDate() + ' ' + this.value.getHours() + ':' + minutes;
+            return this.value.getFullYear() + '-' + month + '-' + day + ' ' + hour + ':' + minutes;
          }
          if (val === 'years') {
             year -= count;
@@ -133,4 +138,4 @@ module.exports = function (date) {
    return time;
 };
 
-//console.log(module.exports('2017-05-16 13:45').add(2, 'light-years'));
+//console.log(module.exports('2016-04-26 15:00').add(5, 'days').subtract(5, 'days'));
