@@ -45,7 +45,18 @@ function select() {
  * @param {Array} values – Массив разрешённых значений
  */
 function filterIn(property, values) {
-
+    var fields = [...arguments];
+    var col = [];
+    friends.forEach(function (elemObj) {
+        var obj = {};
+        for (var i = 1; i < fields.length; i++) {
+            if (elemObj[fields[0]] === fields[i]) {
+                obj = elemObj;
+            }
+        }
+        if (Object.keys(obj).length !== 0) col.push(obj);
+    });
+    return col;
 }
 /*
 module.exports = {
@@ -55,3 +66,4 @@ module.exports = {
 };
 */
 console.log(select('name', 'gender'));
+console.log(filterIn('name', 'Сэм'));
