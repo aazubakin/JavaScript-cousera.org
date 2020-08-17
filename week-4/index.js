@@ -4,23 +4,16 @@
  * @returns {Array}
  */
 
-var friends = [
-    {
-        name: 'Сэм',
-        gender: 'Мужской',
-        email: 'luisazamora@example.com',
-        favoriteFruit: 'Картофель'
-    },
-    {
-        name: 'Эмили',
-        gender: 'Женский',
-        email: 'example@example.com',
-        favoriteFruit: 'Яблоко'
-    }
-]
-
 function query(collection) {
-
+    if (arguments.length === 1) return collection.slice();
+    var col = collection.slice();  
+    var operations = Array.from(arguments).slice(1);   
+    var result = operations.sort().reduce(function(acc,item) {
+      return  item(acc);    
+    },col); 
+    
+   
+    return result;
 }
 
 /**
@@ -28,17 +21,19 @@ function query(collection) {
  */
 function select() {
     var fields = [...arguments];
-    var col = [];
-    for (var i = 0; i < friends.length; i++) {
-        var obj = {};
-        fields.forEach(function (elem) {
-            if (elem in friends[i]) {
-                obj[elem] = friends[i][elem];
-            }
-        });
-        col.push(obj);
+    return function select(collection) {
+        var col = [];
+        for (var i = 0; i < collection.length; i++) {
+            var obj = {};
+            fields.forEach(function (elem) {
+                if (elem in collection[i]) {
+                    obj[elem] = collection[i][elem];
+                }
+            });
+            col.push(obj);
+        }
+        return col;
     }
-    return col;
 }
 /**
  * @param {String} property – Свойство для фильтрации
@@ -46,24 +41,24 @@ function select() {
  */
 function filterIn(property, values) {
     var fields = [...arguments];
-    var col = [];
-    friends.forEach(function (elemObj) {
-        var obj = {};
-        for (var i = 1; i < fields.length; i++) {
-            if (elemObj[fields[0]] === fields[i]) {
-                obj = elemObj;
+    return function filterIn(collection){
+        var col = [];
+        collection.forEach(function (elemObj) {
+            var obj = {};
+            for (var i = 1; i < fields.length; i++) {
+                if (elemObj[fields[0]] === fields[i]) {
+                    obj = elemObj;
+                }
             }
-        }
-        if (Object.keys(obj).length !== 0) col.push(obj);
-    });
-    return col;
+            if (Object.keys(obj).length !== 0) col.push(obj);
+        });
+        return col;
+    }
 }
-/*
+
 module.exports = {
     query: query,
     select: select,
     filterIn: filterIn
 };
-*/
-console.log(select('name', 'gender'));
-console.log(filterIn('name', 'Сэм'));
+
