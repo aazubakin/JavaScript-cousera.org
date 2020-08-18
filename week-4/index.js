@@ -3,15 +3,59 @@
  * @params {Function[]} – Функции для запроса
  * @returns {Array}
  */
+var friends = [
+    {
+        name: 'Сэм',
+        gender: 'Мужской',
+        email: 'luisazamora@example.com',
+        favoriteFruit: 'Картофель'
+    },
+    {
+        name: 'Эмили',
+        gender: 'Женский',
+        email: 'example@example.com',
+        favoriteFruit: 'Яблоко'
+    },
+    {
+        name: 'Мэт',
+        gender: 'Мужской',
+        email: 'danamcgee@example.com',
+        favoriteFruit: 'Яблоко'
+    },
+    {
+        name: 'Брэд',
+        gender: 'Мужской',
+        email: 'newtonwilliams@example.com',
+        favoriteFruit: 'Банан'
+    },
+    {
+        name: 'Шерри',
+        gender: 'Женский',
+        email: 'danamcgee@example.com',
+        favoriteFruit: 'Картофель'
+    },
+    {
+        name: 'Керри',
+        gender: 'Женский',
+        email: 'danamcgee@example.com',
+        favoriteFruit: 'Апельсин'
+    },
+    {
+        name: 'Стелла',
+        gender: 'Женский',
+        email: 'waltersguzman@example.com',
+        favoriteFruit: 'Картофель'
+    }
+];
 
 function query(collection) {
-    if (arguments.length === 1) return collection.slice();
+    if (arguments.length === 1) return collection;
     var col = collection.slice();  
-    var operations = Array.from(arguments).slice(1);   
-    var result = operations.sort().reduce(function(acc,item) {
-      return  item(acc);    
+    //console.log(col);
+    var funct = [...arguments].slice(1);   
+    var result = funct.sort().reduce(function(acc, elem) { 
+        return  elem(acc); 
     },col); 
-    
    
     return result;
 }
@@ -45,8 +89,8 @@ function filterIn(property, values) {
         var col = [];
         collection.forEach(function (elemObj) {
             var obj = {};
-            for (var i = 1; i < fields.length; i++) {
-                if (elemObj[fields[0]] === fields[i]) {
+            for (var i = 0; i < values.length; i++) {
+                if (elemObj[fields[0]] === values[i]) {
                     obj = elemObj;
                 }
             }
@@ -62,3 +106,5 @@ module.exports = {
     filterIn: filterIn
 };
 
+//console.log(query(friends,select('name', 'gender', 'email'), 
+//            filterIn('favoriteFruit',['Яблоко', 'Картофель'])   ));
